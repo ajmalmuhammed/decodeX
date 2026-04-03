@@ -27,6 +27,8 @@ export default function Home() {
 
   const handleLogout = () => signOut(auth);
 
+  const isAdmin = user?.email === 'muhammed.ajmal@webcardio.com';
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
@@ -81,6 +83,16 @@ export default function Home() {
             >
               [ ENTER_DECODING_CHAMBER ]
             </button>
+
+            {isAdmin && (
+              <div style={{ marginTop: '1rem' }}>
+                <a href="/admin">
+                  <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                    [ OPEN_ADMIN_CONTROL_PANEL ]
+                  </button>
+                </a>
+              </div>
+            )}
 
             <div style={{ marginTop: '2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem' }}>
               <button onClick={handleLogout} style={{ border: '1px solid var(--accent)', color: 'var(--accent)', fontSize: '0.8rem' }}>
