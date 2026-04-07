@@ -103,7 +103,7 @@ export default function GameRoom({ user }) {
   if (loading) return <div className="mono neon-text">LOADING_SECURE_CHANNEL...</div>;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
       
       {/* Left Part: Game */}
       <div className="glass-panel" style={{ padding: '2rem' }}>
@@ -159,7 +159,10 @@ export default function GameRoom({ user }) {
             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="mono" style={{ opacity: 0.5 }}>#{index + 1}</span>
-                <span className="mono" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '120px' }}>
+                {item.photoURL && (
+                  <img src={item.photoURL} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid var(--primary)' }} />
+                )}
+                <span className="mono" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
                   {item.displayName}
                 </span>
               </div>

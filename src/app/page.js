@@ -103,11 +103,11 @@ export default function Home() {
         )}
       </div>
 
-      <div className="mono" style={{ position: 'fixed', bottom: '20px', left: '20px', fontSize: '0.7rem', opacity: 0.4 }}>
+      <div className="mono" style={{ position: 'fixed', bottom: '20px', left: '20px', fontSize: '0.7rem', opacity: 0.4, display: 'var(--footer-display, block)' }}>
         SYSTEM_V.1.0.4<br/>
         ENCRYPTION: AES_256
       </div>
-      <div className="mono" style={{ position: 'fixed', bottom: '20px', right: '20px', fontSize: '0.7rem', opacity: 0.4, textAlign: 'right' }}>
+      <div className="mono" style={{ position: 'fixed', bottom: '20px', right: '20px', fontSize: '0.7rem', opacity: 0.4, textAlign: 'right', display: 'var(--footer-display, block)' }}>
         LOC: OFFICE_SERVER_01<br/>
         LAT: 28.6139° N, LON: 77.2090° E
       </div>

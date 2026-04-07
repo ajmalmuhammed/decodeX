@@ -82,7 +82,7 @@ export default function AdminPage() {
         <a href="/"><button style={{ fontSize: '0.7rem' }}>BACK_TO_GAME</button></a>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
+      <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
         
         {/* Left: Add Level Form */}
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
@@ -136,9 +136,12 @@ export default function AdminPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {levels.map(lvl => (
               <div key={lvl.id} style={{ padding: '10px', border: '1px solid var(--glass-border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                <div>
-                  <span className="neon-text mono">{lvl.id}:</span> {lvl.answer} <br/>
-                  <span className="mono" style={{ opacity: 0.5 }}>PATH: {lvl.image}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <img src={lvl.image} alt="" style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--glass-border)' }} />
+                  <div>
+                    <span className="neon-text mono">{lvl.id}:</span> {lvl.answer} <br/>
+                    <span className="mono" style={{ opacity: 0.5 }}>PATH: {lvl.image}</span>
+                  </div>
                 </div>
                 <button 
                   onClick={() => handleDelete(lvl.id)}

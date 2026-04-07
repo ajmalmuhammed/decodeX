@@ -137,3 +137,37 @@ input:focus {
 .flicker {
   animation: flicker 2s infinite;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 2.5rem !important;
+  }
+
+  .glass-panel {
+    padding: 1.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  button {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+
+  .main-container {
+    padding: 10px;
+    --footer-display: none;
+  }
+
+  /* Stack grid layouts on mobile */
+  .responsive-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+}
