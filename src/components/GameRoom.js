@@ -76,15 +76,29 @@ export default function GameRoom({ user }) {
     }
   };
 
-  // Hint Reveal Observer
+  // --- PRECISION HINT TRIGGER (Fix for Vercel Infinite Loop) ---
   useEffect(() => {
-    if (levelData?.hintUnlockTime && !levelData.hint && !levelData.isFinished && !fetchInProgress.current) {
+    // We only set a timer if we have a locked hint
+    if (levelData?.hintUnlockTime && !levelData.hint && !levelData.isFinished) {
       const unlockTime = new Date(levelData.hintUnlockTime);
-      if (currentTime >= unlockTime) {
+      const now = new Date();
+      const timeDiff = unlockTime - now;
+
+      // If time has already passed, trigger exactly once
+      if (timeDiff <= 0) {
+        console.log("🔓 HINT_THRESHOLD_REACHED (ONE-TIME TRIGGER)");
         fetchLevel(userProgress.level);
+      } else {
+        // Otherwise, set a precision timeout for the future
+        console.log(`⏲️ HINT_TIMER_SET: ${Math.round(timeDiff/1000)}s`);
+        const timer = setTimeout(() => {
+          fetchLevel(userProgress.level);
+        }, timeDiff + 1000); // 1s buffer to ensure server clock has passed the mark
+
+        return () => clearTimeout(timer);
       }
     }
-  }, [currentTime, levelData]);
+  }, [levelData?.id, levelData?.hint]); // NO LONGER DEPENDS ON currentTime
 
   // Real-time Leaderboard & Config
   useEffect(() => {
@@ -123,7 +137,6 @@ export default function GameRoom({ user }) {
         await updateDoc(userRef, { level: increment(1), updatedAt: new Date().toISOString() });
         setUserProgress(prev => ({ ...prev, level: prev.level + 1 }));
         setAnswer('');
-        // Immediately fetch next level
         fetchLevel(userProgress.level + 1);
       } else {
         setStatus('ERROR: INCORRECT');
@@ -237,7 +250,6 @@ export default function GameRoom({ user }) {
         )}
       </div>
 
-      {/* Right Part: Leaderboard */}
       <div className="glass-panel" style={{ padding: '1.5rem' }}>
         <h3 className="mono neon-text" style={{ fontSize: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--primary)', paddingBottom: '0.5rem' }}>
           LIVE_RANKINGS
