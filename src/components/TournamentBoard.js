@@ -40,16 +40,17 @@ export default function TournamentBoard() {
 
   const MatchCard = ({ match }) => (
     <div className="glass-panel" style={{ 
-      padding: '12px', 
-      minWidth: '220px', 
+      padding: '10px', 
+      minWidth: '200px', 
       width: '100%',
       borderLeft: `3px solid ${match.status === 'completed' ? 'var(--primary)' : 'var(--secondary)'}`, 
       marginBottom: '10px',
-      background: match.status === 'completed' ? 'rgba(0, 255, 65, 0.02)' : 'rgba(0, 229, 255, 0.02)'
+      background: match.status === 'completed' ? 'rgba(0, 255, 65, 0.02)' : 'rgba(0, 229, 255, 0.02)',
+      boxSizing: 'border-box'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <span className="mono" style={{ fontSize: '0.55rem', opacity: 0.4 }}>{match.status.toUpperCase()}</span>
-        {match.round && <span className="mono" style={{ fontSize: '0.55rem', opacity: 0.3 }}># {match.id.split('_')[1]?.slice(-4)}</span>}
+        <span className="mono" style={{ fontSize: '0.5rem', opacity: 0.4 }}>{match.status.toUpperCase()}</span>
+        {match.id && <span className="mono" style={{ fontSize: '0.5rem', opacity: 0.3 }}># {match.id.slice(-4)}</span>}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {match.players.map((p, idx) => {
@@ -57,8 +58,8 @@ export default function TournamentBoard() {
           const isLoser = match.status === 'completed' && !isWinner;
           return (
             <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: isLoser ? 0.3 : 1 }}>
-              <img src={p.photo} alt="" style={{ width: '20px', height: '20px', borderRadius: '50%', border: isWinner ? '1.5px solid var(--primary)' : '1px solid var(--glass-border)' }} />
-              <div className="mono" style={{ fontSize: '0.7rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <img src={p.photo} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', border: isWinner ? '1.5px solid var(--primary)' : '1px solid var(--glass-border)' }} />
+              <div className="mono" style={{ fontSize: '0.65rem', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {p.name}
               </div>
               {isWinner && <span style={{ fontSize: '10px' }}>👑</span>}
@@ -70,11 +71,11 @@ export default function TournamentBoard() {
   );
 
   const RoundColumn = ({ round, color }) => (
-    <div style={{ minWidth: '260px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+    <div style={{ minWidth: '240px', maxWidth: '300px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
       <div className="mono" style={{ 
         color: color, 
-        fontSize: '0.8rem', 
-        marginBottom: '1.2rem', 
+        fontSize: '0.75rem', 
+        marginBottom: '1rem', 
         fontWeight: 'bold',
         padding: '4px 12px',
         borderBottom: `1px solid ${color}`,
@@ -83,26 +84,25 @@ export default function TournamentBoard() {
       }}>
         &gt; {round.name.toUpperCase()}
       </div>
-      <div style={{ width: '100%', maxWidth: '300px' }}>
+      <div style={{ width: '100%' }}>
         {round.matches.map(m => <MatchCard key={m.id} match={m} />)}
       </div>
     </div>
   );
 
   return (
-    <div style={{ width: '100%', maxWidth: '100vw' }}>
+    <div style={{ width: '100%', maxWidth: '100%' }}>
       
       {/* Game Type Tabs */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', width: '100%' }}>
         <button 
           onClick={() => setSelectedTab('carrom')}
           style={{ 
             flex: 1, 
-            maxWidth: '200px',
             background: selectedTab === 'carrom' ? 'var(--primary)' : 'transparent',
             color: selectedTab === 'carrom' ? 'black' : 'var(--primary)',
             borderColor: 'var(--primary)',
-            fontSize: '0.8rem'
+            padding: '8px 4px'
           }}
         >
           [ CARROM ]
@@ -111,11 +111,10 @@ export default function TournamentBoard() {
           onClick={() => setSelectedTab('ludo')}
           style={{ 
             flex: 1, 
-            maxWidth: '200px',
             background: selectedTab === 'ludo' ? 'var(--secondary)' : 'transparent',
             color: selectedTab === 'ludo' ? 'black' : 'var(--secondary)',
             borderColor: 'var(--secondary)',
-            fontSize: '0.8rem'
+            padding: '8px 4px'
           }}
         >
           [ LUDO ]
