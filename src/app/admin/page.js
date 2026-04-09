@@ -10,9 +10,10 @@ export default function AdminPage() {
   const [levels, setLevels] = useState([]);
   const [users, setUsers] = useState([]);
   const [matches, setMatches] = useState([]);
-  const [newLevel, setNewLevel] = useState({ id: '', answer: '', hint: '', image: '' });
+  const [newLevel, setNewLevel] = useState({ id: '', answer: '', hint: '', image: '', hintUnlockTime: '' });
   const [newMatch, setNewMatch] = useState({ players: [], gameType: 'carrom', round: 'Round 1' });
   const [status, setStatus] = useState('');
+  const [gameConfig, setGameConfig] = useState({ gameStatus: 'standby', unlockedLevel: 1 });
 
   const adminEmail = 'muhammed.ajmal@webcardio.com';
 
@@ -58,8 +59,25 @@ export default function AdminPage() {
       setMatches(list);
     });
 
-    return () => { unsubLevels(); unsubUsers(); unsubMatches(); };
+    const unsubConfig = onSnapshot(doc(db, 'metadata', 'gameConfig'), (snap) => {
+      if (snap.exists()) {
+        setGameConfig(snap.data());
+      } else {
+        // Init config if missing
+        setDoc(doc(db, 'metadata', 'gameConfig'), { gameStatus: 'standby', unlockedLevel: 1 });
+      }
+    });
+
+    return () => { unsubLevels(); unsubUsers(); unsubMatches(); unsubConfig(); };
   }, [user]);
+
+  const updateGameConfig = async (newConfig) => {
+    try {
+      await setDoc(doc(db, 'metadata', 'gameConfig'), newConfig, { merge: true });
+      setStatus('CONFIG_UPDATED');
+      setTimeout(() => setStatus(''), 2000);
+    } catch (err) { console.error(err); }
+  };
 
   const handleAddMatch = async (e) => {
     e.preventDefault();
@@ -103,7 +121,7 @@ export default function AdminPage() {
     try {
       await setDoc(doc(db, 'levels', newLevel.id), newLevel);
       setStatus('LEVEL_ADDED_SUCCESSFULLY');
-      setNewLevel({ id: '', answer: '', hint: '', image: '' });
+      setNewLevel({ id: '', answer: '', hint: '', image: '', hintUnlockTime: '' });
       setTimeout(() => setStatus(''), 2000);
     } catch (err) {
       console.error(err);
@@ -137,6 +155,52 @@ export default function AdminPage() {
       <div className="mono" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="neon-text">ADMIN_CONTROL_PANEL</h1>
         <a href="/"><button style={{ fontSize: '0.7rem' }}>BACK_TO_GAME</button></a>
+      </div>
+
+      {/* --- MISSION CONTROL PANEL --- */}
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2.5rem', borderLeft: '4px solid var(--primary)', background: 'rgba(0, 255, 65, 0.03)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
+          <div>
+            <h2 className="mono neon-text" style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>&gt; MISSION_CONTROL</h2>
+            <p className="mono" style={{ fontSize: '0.7rem', opacity: 0.6 }}>SYSTEM_STATUS: {gameConfig.gameStatus.toUpperCase()}</p>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.5, marginBottom: '5px' }}>GLOBAL_ACCESS</div>
+              <button 
+                onClick={() => updateGameConfig({ gameStatus: gameConfig.gameStatus === 'active' ? 'standby' : 'active' })}
+                style={{ 
+                  background: gameConfig.gameStatus === 'active' ? 'var(--accent)' : 'var(--primary)', 
+                  color: 'black',
+                  borderColor: 'transparent',
+                  minWidth: '140px'
+                }}
+              >
+                {gameConfig.gameStatus === 'active' ? '[ STOP_MISSION ]' : '[ START_MISSION ]'}
+              </button>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.5, marginBottom: '5px' }}>UNLOCKED_LEVEL</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(0,0,0,0.3)', padding: '2px 10px', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                <button 
+                  onClick={() => updateGameConfig({ unlockedLevel: Math.max(1, gameConfig.unlockedLevel - 1) })}
+                  style={{ border: 'none', padding: '5px', fontSize: '1.2rem' }}
+                >
+                  -
+                </button>
+                <span className="mono neon-text" style={{ fontSize: '1.2rem', minWidth: '30px', textAlign: 'center' }}>{gameConfig.unlockedLevel}</span>
+                <button 
+                  onClick={() => updateGameConfig({ unlockedLevel: gameConfig.unlockedLevel + 1 })}
+                  style={{ border: 'none', padding: '5px', fontSize: '1.2rem' }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
@@ -178,6 +242,15 @@ export default function AdminPage() {
                 value={newLevel.hint} 
                 onChange={e => setNewLevel(prev => ({ ...prev, hint: e.target.value }))}
                 placeholder="Give them a clue..."
+              />
+            </div>
+            <div>
+              <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>HINT_UNLOCK_TIME (Scheduled Reveal)</label>
+              <input 
+                type="datetime-local"
+                value={newLevel.hintUnlockTime} 
+                onChange={e => setNewLevel(prev => ({ ...prev, hintUnlockTime: e.target.value }))}
+                style={{ width: '100%', background: 'rgba(255,255,255,0.1)', color: 'white', padding: '10px', border: '1px solid var(--glass-border)', outline: 'none' }}
               />
             </div>
             <button type="submit" style={{ background: 'var(--primary)', color: 'black', marginTop: '1rem' }}>
