@@ -151,8 +151,13 @@ export default function GameRoom({ user }) {
     const diff = new Date(targetTime) - currentTime;
     if (diff <= 0) return null;
     
-    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
     const seconds = Math.floor((diff % 60000) / 1000);
+    
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
@@ -220,7 +225,7 @@ export default function GameRoom({ user }) {
                      {formatCountdown(levelData.hintUnlockTime)}
                    </div>
                    <div style={{ fontSize: '0.5rem', opacity: 0.3, marginTop: '4px' }} className="mono">
-                     HINT_REVEAL: {new Date(levelData.hintUnlockTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                     HINT_REVEAL: {new Date(levelData.hintUnlockTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} @ {new Date(levelData.hintUnlockTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                    </div>
                 </div>
               ) : (

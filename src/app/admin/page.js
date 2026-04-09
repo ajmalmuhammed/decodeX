@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [newMatch, setNewMatch] = useState({ players: [], gameType: 'carrom', round: 'Round 1' });
   const [status, setStatus] = useState('');
   const [gameConfig, setGameConfig] = useState({ gameStatus: 'standby', unlockedLevel: 1 });
+  const [editingLevelId, setEditingLevelId] = useState(null);
 
   const adminEmail = 'muhammed.ajmal@webcardio.com';
 
@@ -120,13 +121,26 @@ export default function AdminPage() {
     setStatus('SAVING...');
     try {
       await setDoc(doc(db, 'levels', newLevel.id), newLevel);
-      setStatus('LEVEL_ADDED_SUCCESSFULLY');
+      setStatus(editingLevelId ? 'LEVEL_UPDATED_SUCCESSFULLY' : 'LEVEL_ADDED_SUCCESSFULLY');
       setNewLevel({ id: '', answer: '', hint: '', image: '', hintUnlockTime: '' });
+      setEditingLevelId(null);
       setTimeout(() => setStatus(''), 2000);
     } catch (err) {
       console.error(err);
       setStatus('ERROR_SAVING_LEVEL');
     }
+  };
+
+  const startEdit = (level) => {
+    setEditingLevelId(level.id);
+    setNewLevel(level);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setEditingLevelId(null);
+    const nextId = `level_${levels.length + 1}`;
+    setNewLevel({ id: nextId, answer: '', hint: '', image: '', hintUnlockTime: '' });
   };
 
   const handleDelete = async (levelId) => {
@@ -206,8 +220,10 @@ export default function AdminPage() {
       <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
         
         {/* Left: Add Level Form */}
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-          <h3 className="mono" style={{ marginBottom: '1.5rem' }}>ADD_NEW_LEVEL</h3>
+        <div className="glass-panel" style={{ padding: '1.5rem', border: editingLevelId ? '1px solid var(--secondary)' : '1px solid var(--glass-border)' }}>
+          <h3 className="mono" style={{ marginBottom: '1.5rem', color: editingLevelId ? 'var(--secondary)' : 'inherit' }}>
+            {editingLevelId ? `EDIT_LEVEL: ${editingLevelId}` : 'ADD_NEW_LEVEL'}
+          </h3>
           <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>LEVEL_ID (e.g. level_4)</label>
@@ -216,6 +232,8 @@ export default function AdminPage() {
                 onChange={e => setNewLevel(prev => ({ ...prev, id: e.target.value }))}
                 placeholder="level_X"
                 required
+                disabled={editingLevelId !== null}
+                style={{ opacity: editingLevelId ? 0.5 : 1, cursor: editingLevelId ? 'not-allowed' : 'text' }}
               />
             </div>
             <div>
@@ -253,9 +271,20 @@ export default function AdminPage() {
                 style={{ width: '100%', background: 'rgba(255,255,255,0.1)', color: 'white', padding: '10px', border: '1px solid var(--glass-border)', outline: 'none' }}
               />
             </div>
-            <button type="submit" style={{ background: 'var(--primary)', color: 'black', marginTop: '1rem' }}>
-              SAVE_SECURE_COORDINATES
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button type="submit" style={{ flex: 2, background: editingLevelId ? 'var(--secondary)' : 'var(--primary)', color: 'black', marginTop: '1rem' }}>
+                {editingLevelId ? 'UPDATE_SECURE_COORDINATES' : 'SAVE_SECURE_COORDINATES'}
+              </button>
+              {editingLevelId && (
+                <button 
+                  type="button" 
+                  onClick={cancelEdit}
+                  style={{ flex: 1, border: '1px solid var(--accent)', color: 'var(--accent)', marginTop: '1rem' }}
+                >
+                  CANCEL
+                </button>
+              )}
+            </div>
             {status && <p className="mono neon-text" style={{ fontSize: '0.8rem', textAlign: 'center' }}>{status}</p>}
           </form>
         </div>
@@ -273,12 +302,20 @@ export default function AdminPage() {
                     <span className="mono" style={{ opacity: 0.5 }}>PATH: {lvl.image}</span>
                   </div>
                 </div>
-                <button 
-                  onClick={() => handleDelete(lvl.id)}
-                  style={{ border: '1px solid var(--accent)', color: 'var(--accent)', padding: '5px 10px', fontSize: '0.6rem' }}
-                >
-                  DELETE
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    onClick={() => startEdit(lvl)}
+                    style={{ border: '1px solid var(--secondary)', color: 'var(--secondary)', padding: '5px 10px', fontSize: '0.6rem' }}
+                  >
+                    EDIT
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(lvl.id)}
+                    style={{ border: '1px solid var(--accent)', color: 'var(--accent)', padding: '5px 10px', fontSize: '0.6rem' }}
+                  >
+                    DELETE
+                  </button>
+                </div>
               </div>
             ))}
           </div>

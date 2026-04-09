@@ -47,7 +47,7 @@ export default function Home() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'var(--primary)', boxShadow: '0 0 15px var(--primary)' }}></div>
         
         <h1 className="neon-text flicker" style={{ marginBottom: '0.5rem', fontWeight: 800 }}>DECODEX</h1>
-        <p className="mono" style={{ marginBottom: '2.5rem', opacity: 0.8, fontSize: 'clamp(0.6rem, 2vw, 0.9rem)', letterSpacing: '0.2rem' }}>// WEBCARDIO_INTELLIGENCE_UNIT</p>
+        <p className="mono" style={{ marginBottom: '2.5rem', opacity: 0.8, fontSize: 'clamp(0.6rem, 2vw, 0.9rem)', letterSpacing: '0.2rem' }}>// WEBCARDIO_INTEL_UNIT</p>
 
         {!user ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
