@@ -13,6 +13,9 @@ export default function GameRoom({ user }) {
   const [gameConfig, setGameConfig] = useState({ gameStatus: 'active', unlockedLevel: 99 });
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isUserFetched, setIsUserFetched] = useState(false);
+  const [debugHintOverride, setDebugHintOverride] = useState(false);
+  
+  const isAdmin = user?.email?.toLowerCase() === 'muhammed.ajmal@webcardio.com';
 
   // 1. Fetch User Progress
   useEffect(() => {
@@ -50,11 +53,15 @@ export default function GameRoom({ user }) {
         setLevelData(data);
       } else {
         // Handle case where we run out of levels or 404
-        setLevelData({ 
-          image: '/congrats.gif', 
-          hint: 'You have completed all levels, Agent!',
-          isFinished: true 
-        });
+        if (userProgress.level > 1) {
+          setLevelData({ 
+            image: '/congrats.gif', 
+            hint: 'You have completed all levels, Agent!',
+            isFinished: true 
+          });
+        } else {
+          setStatus('ERROR: LEVEL_1_MISSING. CHECK ADMIN PANEL.');
+        }
       }
     } catch (err) {
       console.error("Fetch Level Error:", err);
@@ -147,6 +154,36 @@ export default function GameRoom({ user }) {
     }
   };
 
+  const forceNextLevel = async () => {
+    if (!isAdmin) return;
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        level: increment(1),
+        updatedAt: new Date().toISOString()
+      });
+      setUserProgress(prev => ({ ...prev, level: prev.level + 1 }));
+      setAnswer('');
+      setStatus('DEBUG: LEVEL_SKIPPED');
+    } catch (err) { console.error(err); }
+  };
+
+  const resetProgress = async () => {
+    if (!isAdmin || !confirm('RESET YOUR PROGRESS?')) return;
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        level: 1,
+        updatedAt: new Date().toISOString()
+      });
+      setUserProgress(prev => ({ ...prev, level: 1 }));
+      setLevelData(null);
+      setDebugHintOverride(false);
+      setAnswer('');
+      setStatus('DEBUG: PROGRESS_RESET');
+    } catch (err) { console.error(err); }
+  };
+
   const formatCountdown = (targetTime) => {
     const diff = new Date(targetTime) - currentTime;
     if (diff <= 0) return null;
@@ -211,7 +248,7 @@ export default function GameRoom({ user }) {
                 </div>
 
             <div style={{ marginBottom: '1.5rem', minHeight: '4rem' }}>
-              {levelData?.hintUnlockTime && new Date(levelData.hintUnlockTime) > currentTime ? (
+              {(levelData?.hintUnlockTime && new Date(levelData.hintUnlockTime) > currentTime && !debugHintOverride) ? (
                 <div className="glass-panel" style={{ 
                   padding: '12px', 
                   background: 'rgba(0, 229, 255, 0.03)', 
@@ -259,6 +296,35 @@ export default function GameRoom({ user }) {
               YOU HAVE DECODED ALL AVAILABLE INTEL. STAND BY FOR FURTHER INSTRUCTIONS FROM BASE COMMAND.
             </p>
             <div style={{ marginTop: '2rem', width: '100%', height: '1px', background: 'var(--primary)', opacity: 0.3 }}></div>
+          </div>
+        )}
+
+        {/* --- ADMIN DEBUG PANEL --- */}
+        {isAdmin && (
+          <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px dashed var(--glass-border)' }}>
+            <div className="mono" style={{ fontSize: '0.6rem', color: 'var(--accent)', marginBottom: '1rem', opacity: 0.7 }}>
+              [ADMIN_DEBUG_OVERSIGHT]
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button 
+                onClick={forceNextLevel}
+                style={{ fontSize: '0.6rem', padding: '5px 15px', border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent' }}
+              >
+                SKIP_LEVEL
+              </button>
+              <button 
+                onClick={() => setDebugHintOverride(!debugHintOverride)}
+                style={{ fontSize: '0.6rem', padding: '5px 15px', border: '1px solid var(--secondary)', color: 'var(--secondary)', background: 'transparent' }}
+              >
+                {debugHintOverride ? 'RE-LOCK_HINTS' : 'BYPASS_HINT_LOCK'}
+              </button>
+              <button 
+                onClick={resetProgress}
+                style={{ fontSize: '0.6rem', padding: '5px 15px', border: '1px solid var(--accent)', color: 'var(--accent)', background: 'transparent' }}
+              >
+                RESET_MY_LEVEL
+              </button>
+            </div>
           </div>
         )}
       </div>

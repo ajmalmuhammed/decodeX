@@ -1,15 +1,14 @@
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
 import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
   const { id } = await params;
 
   try {
-    const levelRef = doc(db, 'levels', id);
-    const snap = await getDoc(levelRef);
+    const docRef = adminDb.collection('levels').doc(id);
+    const snap = await docRef.get();
 
-    if (!snap.exists()) {
+    if (!snap.exists) {
       return NextResponse.json({ error: 'Level not found' }, { status: 404 });
     }
 
@@ -17,17 +16,14 @@ export async function GET(request, { params }) {
     const now = new Date();
     const unlockTime = data.hintUnlockTime ? new Date(data.hintUnlockTime) : null;
 
-    // Generate SHA-256 hash of the answer for secure client-side check
-    const crypto = require('crypto');
-    const answerHash = data.answer 
-      ? crypto.createHash('sha256').update(data.answer.toLowerCase().trim()).digest('hex') 
-      : null;
-
     // Build secure response
     const secureData = {
+      id: id,
       image: data.image,
       hintUnlockTime: data.hintUnlockTime,
-      answerHash: answerHash,
+      answerHash: data.answer 
+        ? require('crypto').createHash('sha256').update(data.answer.toLowerCase().trim()).digest('hex') 
+        : null,
       hint: null
     };
 
