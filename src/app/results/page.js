@@ -42,7 +42,7 @@ export default function ResultsPage() {
   return (
     <main style={{ minHeight: '100vh', padding: '2rem' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>
+        <div className="responsive-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>
           <div>
             <h1 className="neon-text flicker" style={{ fontSize: '2rem', marginBottom: '0.2rem' }}>TOURNAMENT_RESULTS</h1>
             <p className="mono" style={{ fontSize: '0.7rem', opacity: 0.5 }}>// LIVE_FEED_01</p>
