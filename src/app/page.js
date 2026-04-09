@@ -43,34 +43,26 @@ export default function Home() {
       
       <MissionBriefing isOpen={isBriefingOpen} onClose={() => setIsBriefingOpen(false)} />
 
-      <div className="glass-panel" style={{ padding: '3rem', maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ maxWidth: '600px', width: '100%', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'var(--primary)', boxShadow: '0 0 15px var(--primary)' }}></div>
         
-        <h1 className="neon-text flicker" style={{ fontSize: '4rem', marginBottom: '0.5rem', fontWeight: 800 }}>DECODEX</h1>
-        <p className="mono" style={{ marginBottom: '2.5rem', opacity: 0.8, fontSize: '0.9rem', letterSpacing: '0.2rem' }}>// OFFICE_INTELLIGENCE_UNIT</p>
+        <h1 className="neon-text flicker" style={{ marginBottom: '0.5rem', fontWeight: 800 }}>DECODEX</h1>
+        <p className="mono" style={{ marginBottom: '2.5rem', opacity: 0.8, fontSize: 'clamp(0.6rem, 2vw, 0.9rem)', letterSpacing: '0.2rem' }}>// WEBCARDIO_INTELLIGENCE_UNIT</p>
 
         {!user ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <p style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
+            <p className="mono" style={{ fontSize: 'clamp(0.8rem, 3vw, 1.1rem)', lineHeight: '1.6', opacity: 0.9 }}>
               Welcome, Agent. Verify your credentials to enter the decoding chamber.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <button 
-                onClick={handleLogin} 
-                style={{ 
-                  width: '100%', 
-                  fontSize: 'clamp(0.8rem, 4vw, 1.1rem)', 
-                  whiteSpace: 'nowrap',
-                  padding: '12px 10px'
-                }}
-              >
+              <button onClick={handleLogin} style={{ width: '100%' }}>
                 [ VERIFY_IDENTITY_VIA_GOOGLE ]
               </button>
-              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
                 [ VIEW_RULES ]
               </button>
               <Link href="/results" style={{ width: '100%' }}>
-                <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                <button style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
                   [ VIEW_TOURNAMENT_RESULTS ]
                 </button>
               </Link>
@@ -81,30 +73,37 @@ export default function Home() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="mono" style={{ background: 'rgba(0,255,65,0.1)', padding: '10px', border: '1px solid var(--primary)', marginBottom: '1rem' }}>
+            <div className="mono" style={{ 
+              background: 'rgba(0,255,65,0.1)', 
+              padding: '12px', 
+              border: '1px solid var(--primary)', 
+              marginBottom: '1rem',
+              fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+              wordBreak: 'break-all'
+            }}>
                ACCESS_GRANTED: {user.displayName?.toUpperCase()}
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Link href="/game" style={{ width: '100%' }}>
+              <Link href="/game" style={{ width: '100%', display: 'block' }}>
                 <button style={{ width: '100%', background: 'var(--primary)', color: 'black' }}>
                   [ ENTER_DECODING_CHAMBER ]
                 </button>
               </Link>
 
-              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
                 [ VIEW_RULES ]
               </button>
 
-              <Link href="/results" style={{ width: '100%' }}>
-                <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+              <Link href="/results" style={{ width: '100%', display: 'block' }}>
+                <button style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
                   [ VIEW_TOURNAMENT_RESULTS ]
                 </button>
               </Link>
 
               {isAdmin && (
-                <Link href="/admin" style={{ width: '100%' }}>
-                  <button style={{ width: '100%', border: '1px solid var(--accent)', color: 'var(--accent)' }}>
+                <Link href="/admin" style={{ width: '100%', display: 'block' }}>
+                  <button style={{ width: '100%', borderColor: 'var(--accent)', color: 'var(--accent)' }}>
                     [ OPEN_ADMIN_CONTROL_PANEL ]
                   </button>
                 </Link>

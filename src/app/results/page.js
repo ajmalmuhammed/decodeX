@@ -40,15 +40,15 @@ export default function ResultsPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', padding: '2rem' }}>
+    <main style={{ minHeight: '100vh', padding: 'clamp(1rem, 4vw, 2rem)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div className="responsive-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>
           <div>
-            <h1 className="neon-text flicker" style={{ fontSize: '2rem', marginBottom: '0.2rem' }}>TOURNAMENT_RESULTS</h1>
+            <h1 className="neon-text flicker" style={{ marginBottom: '0.2rem' }}>TOURNAMENT_RESULTS</h1>
             <p className="mono" style={{ fontSize: '0.7rem', opacity: 0.5 }}>// LIVE_FEED_01</p>
           </div>
           <Link href="/">
-            <button style={{ fontSize: '0.8rem' }}>[ RETURN_TO_BASE ]</button>
+            <button style={{ fontSize: '0.7rem' }}>[ RETURN_TO_BASE ]</button>
           </Link>
         </div>
 

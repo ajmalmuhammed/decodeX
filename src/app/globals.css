@@ -72,12 +72,21 @@ h1, h2, h3, h4, .mono {
   letter-spacing: -0.02em;
 }
 
+h1 {
+  font-size: clamp(1.8rem, 8vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 6vw, 2.5rem);
+}
+
 .glass-panel {
   background: var(--glass);
   backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  padding: clamp(1rem, 5vw, 3rem);
 }
 
 .neon-text {
@@ -101,6 +110,8 @@ button {
   border-radius: 4px;
   text-transform: uppercase;
   font-weight: bold;
+  font-size: clamp(0.7rem, 3.5vw, 1rem);
+  white-space: nowrap;
 }
 
 button:hover {
@@ -144,19 +155,15 @@ input:focus {
     padding: 10px;
   }
 
-  h1 {
-    font-size: 2.5rem !important;
-  }
-
   .glass-panel {
-    padding: 1.5rem !important;
+    padding: 1rem !important;
     width: 100% !important;
     max-width: 100% !important;
   }
 
   button {
-    padding: 12px 15px;
-    font-size: 0.9rem;
+    padding: 10px 12px;
+    letter-spacing: -0.02em;
   }
 
   .main-container {
@@ -174,7 +181,8 @@ input:focus {
   /* Utility for flex items that should stack on mobile */
   .responsive-flex {
     flex-direction: column !important;
-    align-items: flex-start !important;
+    align-items: center !important;
+    text-align: center !important;
     gap: 1.5rem !important;
   }
 }
