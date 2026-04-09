@@ -16,6 +16,12 @@ export async function GET(request, { params }) {
     const now = new Date();
     const unlockTime = data.hintUnlockTime ? new Date(data.hintUnlockTime) : null;
 
+    // DIAGNOSTIC LOGS for debugging timezone issues on Vercel
+    console.log(`[API_HINT_CHECK] Level: ${id}`);
+    console.log(`[API_HINT_CHECK] Server Now: ${now.toISOString()}`);
+    console.log(`[API_HINT_CHECK] Unlock Time: ${unlockTime ? unlockTime.toISOString() : 'NONE'}`);
+    console.log(`[API_HINT_CHECK] Reveal Condition met: ${!unlockTime || now >= unlockTime}`);
+
     // Build secure response
     const secureData = {
       id: id,
