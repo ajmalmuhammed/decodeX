@@ -15,7 +15,7 @@ export default function GameRoom({ user }) {
   const [isUserFetched, setIsUserFetched] = useState(false);
   const [debugHintOverride, setDebugHintOverride] = useState(false);
   
-  const isAdmin = user?.email?.toLowerCase() === 'muhammed.ajmal@webcardio.com';
+  const isAdmin = ['muhammed.ajmal@webcardio.com', 'aysha.s@webcardio.com'].includes(user?.email?.toLowerCase());
 
   // 1. Fetch User Progress
   useEffect(() => {

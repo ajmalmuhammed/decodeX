@@ -28,7 +28,7 @@ export default function Home() {
 
   const handleLogout = () => signOut(auth);
 
-  const isAdmin = user?.email?.toLowerCase() === 'muhammed.ajmal@webcardio.com';
+  const isAdmin = ['muhammed.ajmal@webcardio.com', 'aysha.s@webcardio.com'].includes(user?.email?.toLowerCase());
 
   if (loading) {
     return (
