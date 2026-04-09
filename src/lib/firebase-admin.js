@@ -7,7 +7,7 @@ try {
 } catch (e) {
   // 2. Fallback to Environment Variables
   // We trim and clean the private key to prevent common Vercel formatting errors
-  const rawKey = process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY;
+  const rawKey = process.env.FIREBASE_PRIVATE_KEY || process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY;
   const privateKey = rawKey ? rawKey.replace(/\\n/g, '\n').replace(/^"(.*)"$/, '$1') : undefined;
 
   serviceAccount = {
