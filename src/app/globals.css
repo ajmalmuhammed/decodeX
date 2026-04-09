@@ -164,10 +164,17 @@ input:focus {
     --footer-display: none;
   }
 
-  /* Stack grid layouts on mobile */
+  /* Responsive grid remains as is */
   .responsive-grid {
     display: flex !important;
     flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Utility for flex items that should stack on mobile */
+  .responsive-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
     gap: 1.5rem !important;
   }
 }

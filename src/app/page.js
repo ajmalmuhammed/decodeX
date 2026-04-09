@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { auth, googleProvider } from '@/lib/firebase';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
-import GameRoom from '@/components/GameRoom';
+import Link from 'next/link';
+import MissionBriefing from '@/components/MissionBriefing';
 
 export default function Home() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showGame, setShowGame] = useState(false);
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -27,7 +28,7 @@ export default function Home() {
 
   const handleLogout = () => signOut(auth);
 
-  const isAdmin = user?.email === 'muhammed.ajmal@webcardio.com';
+  const isAdmin = user?.email?.toLowerCase() === 'muhammed.ajmal@webcardio.com';
 
   if (loading) {
     return (
@@ -37,16 +38,11 @@ export default function Home() {
     );
   }
 
-  if (user && showGame) {
-    return (
-      <main style={{ minHeight: '100vh', padding: '2rem' }}>
-        <GameRoom user={user} />
-      </main>
-    );
-  }
-
   return (
     <main style={{ minHeight: '100vh', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      
+      <MissionBriefing isOpen={isBriefingOpen} onClose={() => setIsBriefingOpen(false)} />
+
       <div className="glass-panel" style={{ padding: '3rem', maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'var(--primary)', boxShadow: '0 0 15px var(--primary)' }}></div>
         
@@ -56,12 +52,28 @@ export default function Home() {
         {!user ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <p style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
-              Welcome, Agent. To begin the decoding process, please verify your credentials.
+              Welcome, Agent. Verify your credentials to enter the decoding chamber.
             </p>
-            <div style={{ marginTop: '1rem' }}>
-              <button onClick={handleLogin} style={{ width: '100%', fontSize: '1.1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <button 
+                onClick={handleLogin} 
+                style={{ 
+                  width: '100%', 
+                  fontSize: 'clamp(0.8rem, 4vw, 1.1rem)', 
+                  whiteSpace: 'nowrap',
+                  padding: '12px 10px'
+                }}
+              >
                 [ VERIFY_IDENTITY_VIA_GOOGLE ]
               </button>
+              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                [ VIEW_RULES ]
+              </button>
+              <Link href="/results" style={{ width: '100%' }}>
+                <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                  [ VIEW_TOURNAMENT_RESULTS ]
+                </button>
+              </Link>
             </div>
             <p className="mono" style={{ fontSize: '0.7rem', marginTop: '1rem', opacity: 0.5 }}>
               STATUS: UNAUTHORIZED_ACCESS_DETECTED
@@ -73,26 +85,31 @@ export default function Home() {
                ACCESS_GRANTED: {user.displayName?.toUpperCase()}
             </div>
             
-            <p style={{ fontSize: '1.1rem' }}>
-              Connection established. Ready to begin your mission.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <Link href="/game" style={{ width: '100%' }}>
+                <button style={{ width: '100%', background: 'var(--primary)', color: 'black' }}>
+                  [ ENTER_DECODING_CHAMBER ]
+                </button>
+              </Link>
 
-            <button 
-              onClick={() => setShowGame(true)}
-              style={{ width: '100%', background: 'var(--primary)', color: 'black' }}
-            >
-              [ ENTER_DECODING_CHAMBER ]
-            </button>
+              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                [ VIEW_RULES ]
+              </button>
 
-            {isAdmin && (
-              <div style={{ marginTop: '1rem' }}>
-                <a href="/admin">
-                  <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+              <Link href="/results" style={{ width: '100%' }}>
+                <button style={{ width: '100%', border: '1px solid var(--secondary)', color: 'var(--secondary)' }}>
+                  [ VIEW_TOURNAMENT_RESULTS ]
+                </button>
+              </Link>
+
+              {isAdmin && (
+                <Link href="/admin" style={{ width: '100%' }}>
+                  <button style={{ width: '100%', border: '1px solid var(--accent)', color: 'var(--accent)' }}>
                     [ OPEN_ADMIN_CONTROL_PANEL ]
                   </button>
-                </a>
-              </div>
-            )}
+                </Link>
+              )}
+            </div>
 
             <div style={{ marginTop: '2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem' }}>
               <button onClick={handleLogout} style={{ border: '1px solid var(--accent)', color: 'var(--accent)', fontSize: '0.8rem' }}>
@@ -104,7 +121,7 @@ export default function Home() {
       </div>
 
       <div className="mono" style={{ position: 'fixed', bottom: '20px', left: '20px', fontSize: '0.7rem', opacity: 0.4, display: 'var(--footer-display, block)' }}>
-        SYSTEM_V.1.0.4<br/>
+        SYSTEM_V.1.0.5<br/>
         ENCRYPTION: AES_256
       </div>
       <div className="mono" style={{ position: 'fixed', bottom: '20px', right: '20px', fontSize: '0.7rem', opacity: 0.4, textAlign: 'right', display: 'var(--footer-display, block)' }}>

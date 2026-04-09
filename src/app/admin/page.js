@@ -8,10 +8,19 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [levels, setLevels] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [matches, setMatches] = useState([]);
   const [newLevel, setNewLevel] = useState({ id: '', answer: '', hint: '', image: '' });
+  const [newMatch, setNewMatch] = useState({ players: [], gameType: 'carrom', round: 'Round 1' });
   const [status, setStatus] = useState('');
 
   const adminEmail = 'muhammed.ajmal@webcardio.com';
+
+  useEffect(() => {
+    if (user) {
+      console.log("Logged in as:", user.email);
+    }
+  }, [user]);
 
   // 1. Auth Check
   useEffect(() => {
@@ -22,21 +31,69 @@ export default function AdminPage() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Fetch Levels
+  // 2. Fetch Levels, Users, and Matches
   useEffect(() => {
-    if (user?.email !== adminEmail) return;
-    const q = query(collection(db, 'levels'), orderBy('id', 'asc'));
-    const unsubscribe = onSnapshot(q, (snap) => {
+    if (user?.email?.toLowerCase() !== adminEmail) return;
+    
+    const qLevels = query(collection(db, 'levels'), orderBy('id', 'asc'));
+    const unsubLevels = onSnapshot(qLevels, (snap) => {
       const list = [];
       snap.forEach(doc => list.push(doc.data()));
       setLevels(list);
-      
-      // Auto-suggest next level ID
       const nextId = `level_${list.length + 1}`;
       setNewLevel(prev => ({ ...prev, id: nextId }));
     });
-    return () => unsubscribe();
+
+    const qUsers = query(collection(db, 'users'), orderBy('displayName', 'asc'));
+    const unsubUsers = onSnapshot(qUsers, (snap) => {
+      const list = [];
+      snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+      setUsers(list);
+    });
+
+    const qMatches = query(collection(db, 'matches'), orderBy('id', 'desc'));
+    const unsubMatches = onSnapshot(qMatches, (snap) => {
+      const list = [];
+      snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+      setMatches(list);
+    });
+
+    return () => { unsubLevels(); unsubUsers(); unsubMatches(); };
   }, [user]);
+
+  const handleAddMatch = async (e) => {
+    e.preventDefault();
+    if (newMatch.players.length < 2) return;
+    
+    const matchId = `match_${Date.now()}`;
+    const selectedPlayers = users.filter(u => newMatch.players.includes(u.id));
+    
+    try {
+      await setDoc(doc(db, 'matches', matchId), {
+        id: matchId,
+        gameType: newMatch.gameType,
+        players: selectedPlayers.map(p => ({ id: p.id, name: p.displayName, photo: p.photoURL })),
+        round: newMatch.round,
+        winner: null,
+        status: 'pending'
+      });
+      setNewMatch({ players: [], gameType: 'carrom', round: 'Round 1' });
+    } catch (err) { console.error(err); }
+  };
+
+  const setWinner = async (matchId, player) => {
+    try {
+      await setDoc(doc(db, 'matches', matchId), { 
+        winner: player, 
+        status: 'completed' 
+      }, { merge: true });
+    } catch (err) { console.error(err); }
+  };
+
+  const deleteMatch = async (matchId) => {
+    if (!confirm('Delete this match?')) return;
+    try { await deleteDoc(doc(db, 'matches', matchId)); } catch (err) { console.error(err); }
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -65,7 +122,7 @@ export default function AdminPage() {
 
   if (loading) return <div className="mono neon-text" style={{ padding: '2rem' }}>VERIFYING_CREDENTIALS...</div>;
 
-  if (!user || user.email !== adminEmail) {
+  if (!user || user.email?.toLowerCase() !== adminEmail) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center' }}>
         <h1 className="flicker" style={{ color: 'var(--accent)' }}>ACCESS_DENIED</h1>
@@ -151,6 +208,97 @@ export default function AdminPage() {
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* --- TOURNAMENT SECTION --- */}
+      <div className="mono neon-text" style={{ margin: '3rem 0 1.5rem 0', borderBottom: '1px solid var(--primary)', paddingBottom: '0.5rem' }}>
+        TOURNAMENT_COMMAND_CENTER
+      </div>
+
+      <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
+        
+        {/* Create Match */}
+        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <h3 className="mono" style={{ marginBottom: '1.5rem' }}>CREATE_MATCH</h3>
+          <form onSubmit={handleAddMatch} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>GAME_TYPE</label>
+              <select 
+                value={newMatch.gameType}
+                onChange={e => setNewMatch(prev => ({ ...prev, gameType: e.target.value }))}
+                style={{ width: '100%', background: 'rgba(255,255,255,0.1)', color: 'white', padding: '10px', border: '1px solid var(--glass-border)', outline: 'none' }}
+              >
+                <option value="carrom" style={{ background: '#000' }}>CARROM (1v1)</option>
+                <option value="ludo" style={{ background: '#000' }}>LUDO (Group of 4)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>SELECT_PLAYERS (Hold Ctrl/Cmd to select multiple)</label>
+              <select 
+                multiple
+                value={newMatch.players}
+                onChange={e => setNewMatch(prev => ({ ...prev, players: Array.from(e.target.selectedOptions, option => option.value) }))}
+                style={{ width: '100%', background: 'rgba(255,255,255,0.1)', color: 'white', padding: '10px', border: '1px solid var(--glass-border)', height: '120px' }}
+              >
+                {users.map(u => (
+                  <option key={u.id} value={u.id} style={{ background: '#000' }}>{u.displayName}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>ROUND / GROUP NAME</label>
+              <input 
+                value={newMatch.round}
+                onChange={e => setNewMatch(prev => ({ ...prev, round: e.target.value }))}
+                placeholder="Quarter Finals / Group A"
+              />
+            </div>
+
+            <button type="submit" style={{ background: 'var(--secondary)', color: 'black' }}>
+              INITIALIZE_MATCH
+            </button>
+          </form>
+        </div>
+
+        {/* Match List */}
+        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <h3 className="mono" style={{ marginBottom: '1.5rem' }}>ACTIVE_MATCHES</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {matches.map(m => (
+              <div key={m.id} className="mono" style={{ padding: '15px', border: '1px solid var(--glass-border)', borderRadius: '4px', background: m.status === 'completed' ? 'rgba(0,255,65,0.05)' : 'transparent' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <span className="neon-text" style={{ fontSize: '0.7rem' }}>{m.gameType.toUpperCase()} | {m.round}</span>
+                  <button onClick={() => deleteMatch(m.id)} style={{ padding: '2px 5px', fontSize: '0.5rem', border: '1px solid var(--accent)', color: 'var(--accent)' }}>DEL</button>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '10px', marginBottom: '10px' }}>
+                  {m.players.map(p => (
+                    <div 
+                      key={p.id} 
+                      onClick={() => m.status === 'pending' && setWinner(m.id, p)}
+                      style={{ 
+                        padding: '5px', 
+                        textAlign: 'center', 
+                        border: '1px solid',
+                        borderColor: m.winner?.id === p.id ? 'var(--primary)' : 'var(--glass-border)',
+                        cursor: m.status === 'pending' ? 'pointer' : 'default',
+                        opacity: m.status === 'completed' && m.winner?.id !== p.id ? 0.3 : 1
+                      }}
+                    >
+                      <img src={p.photo} style={{ width: '30px', height: '30px', borderRadius: '50%', marginBottom: '5px' }} />
+                      <div style={{ fontSize: '0.6rem', overflow: 'hidden' }}>{p.name.split(' ')[0]}</div>
+                      {m.winner?.id === p.id && <div style={{ fontSize: '0.5rem', color: 'var(--primary)' }}>WINNER</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {matches.length === 0 && <p className="mono" style={{ opacity: 0.5, fontSize: '0.8rem' }}>NO_MATCHES_SCHEDULED</p>}
           </div>
         </div>
 
