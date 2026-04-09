@@ -6,15 +6,16 @@ try {
   serviceAccount = require('../../serviceAccountKey.json');
 } catch (e) {
   // Vercel / Production environment variables
+  // Firebase Admin expects the exact keys from the JSON file
   serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    // Note: The replace handles the way Vercel stores newline characters in private keys
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
   };
 }
 
-if (!admin.apps.length) {
+// Security Check: Only initialize if we have the minimum required data
+if (!admin.apps.length && (serviceAccount.project_id || serviceAccount.projectId)) {
   try {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
