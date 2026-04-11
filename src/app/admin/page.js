@@ -220,7 +220,20 @@ export default function AdminPage() {
               {levels.map(lvl => {
                 const isRevealed = revealedAnswers.includes(lvl.id);
                 return (
-                  <div key={lvl.id} style={{ padding: '10px', border: '1px solid var(--glass-border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                  <div 
+                    key={lvl.id} 
+                    className="responsive-header"
+                    style={{ 
+                      padding: '10px', 
+                      border: '1px solid var(--glass-border)', 
+                      borderRadius: '4px', 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      fontSize: '0.8rem',
+                      gap: '10px'
+                    }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                       <img src={lvl.image} alt="" style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--glass-border)' }} />
                       <div>
