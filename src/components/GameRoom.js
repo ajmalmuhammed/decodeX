@@ -29,7 +29,10 @@ export default function GameRoom({ user }) {
       const token = await user.getIdToken();
       const response = await fetch('/api/game-init', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-email': user.email || ''
+        },
         body: JSON.stringify({
           token,
           uid: user.uid,
@@ -103,17 +106,27 @@ export default function GameRoom({ user }) {
 
   // Real-time Leaderboard & Config
   useEffect(() => {
-    const q = query(collection(db, 'users'), orderBy('level', 'desc'), orderBy('updatedAt', 'asc'), limit(10));
+    const q = query(collection(db, 'users'), orderBy('level', 'desc'), orderBy('updatedAt', 'asc'), limit(15));
     const unsubscribe = onSnapshot(q, (snap) => {
       const board = [];
-      snap.forEach(doc => board.push({ id: doc.id, ...doc.data() }));
-      setLeaderboard(board);
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (!data.isAdmin) {
+          board.push({ id: doc.id, ...data });
+        }
+      });
+      setLeaderboard(board.slice(0, 10));
     }, (error) => {
       if (error.code === 'failed-precondition') {
-        onSnapshot(query(collection(db, 'users'), orderBy('level', 'desc'), limit(10)), (snap) => {
+        onSnapshot(query(collection(db, 'users'), orderBy('level', 'desc'), limit(15)), (snap) => {
           const board = [];
-          snap.forEach(doc => board.push({ id: doc.id, ...doc.data() }));
-          setLeaderboard(board);
+          snap.forEach(doc => {
+            const data = doc.data();
+            if (!data.isAdmin) {
+              board.push({ id: doc.id, ...data });
+            }
+          });
+          setLeaderboard(board.slice(0, 10));
         });
       }
     });

@@ -59,7 +59,6 @@ export default function TournamentBoard() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <span className="mono" style={{ fontSize: '0.5rem', opacity: 0.4 }}>{match.status.toUpperCase()}</span>
-        {match.id && <span className="mono" style={{ fontSize: '0.5rem', opacity: 0.3 }}># {match.id.slice(-4)}</span>}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {match.players.map((p, idx) => {

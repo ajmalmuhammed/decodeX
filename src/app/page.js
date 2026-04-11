@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { auth, googleProvider } from '@/lib/firebase';
+import { auth, googleProvider, db } from '@/lib/firebase';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
 import MissionBriefing from '@/components/MissionBriefing';
 
@@ -9,16 +10,32 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const q = query(collection(db, 'users'), orderBy('level', 'desc'), orderBy('updatedAt', 'asc'), limit(15));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const board = [];
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (!data.isAdmin) {
+          board.push({ id: doc.id, ...data });
+        }
+      });
+      setLeaderboard(board.slice(0, 10));
+    });
+
+    const authUnsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
       if (currentUser) {
         initializeUser(currentUser);
       }
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      authUnsubscribe();
+    };
   }, []);
 
   const handleLogin = async () => {
@@ -37,7 +54,10 @@ export default function Home() {
       const token = await currentUser.getIdToken();
       await fetch('/api/game-init', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-email': currentUser.email || '' 
+        },
         body: JSON.stringify({
           token,
           uid: currentUser.uid,

@@ -13,6 +13,10 @@ export async function POST(request) {
     // but in production, you'd use admin.auth().verifyIdToken(token)
 
     // 2. Fetch/Create User Progress
+    const adminEmails = ['muhammed.ajmal@webcardio.com', 'aysha.s@webcardio.com'];
+    const email = request.headers.get('x-user-email') || ''; // We'll pass this from client
+    const isUserAdmin = adminEmails.includes(email.toLowerCase());
+
     const userRef = adminDb.collection('users').doc(uid);
     let userSnap = await userRef.get();
     
@@ -21,12 +25,20 @@ export async function POST(request) {
       userProgress = {
         displayName,
         photoURL,
+        email,
+        isAdmin: isUserAdmin,
         level: 1,
         updatedAt: new Date().toISOString()
       };
       await userRef.set(userProgress);
     } else {
       userProgress = userSnap.data();
+      // Update email/admin status if missing or changed
+      if (!userProgress.email || userProgress.isAdmin !== isUserAdmin) {
+        await userRef.update({ email, isAdmin: isUserAdmin });
+        userProgress.email = email;
+        userProgress.isAdmin = isUserAdmin;
+      }
     }
 
     // 3. Fetch Level Data
