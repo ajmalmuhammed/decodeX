@@ -170,7 +170,7 @@ export default function GameRoom({ user }) {
   return (
     <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
       <div className="glass-panel" style={{ padding: '2rem' }}>
-        <div className="mono" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+        <div className="mono responsive-header" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
           <span>MODULE: {levelData?.isFinished ? 'COMPLETED' : `LEVEL_${userProgress?.level}`}</span>
           <span className="neon-text">AGENT: {user.displayName}</span>
         </div>
@@ -178,10 +178,10 @@ export default function GameRoom({ user }) {
         {!levelData?.isFinished ? (
           <>
             {gameConfig.gameStatus === 'standby' ? (
-              <div style={{ textAlign: 'center', padding: '3rem', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '20rem', opacity: 0.02, fontWeight: '900', pointerEvents: 'none' }}>00</div>
-                <div className="flicker" style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--secondary)', opacity: 0.3 }}>&lt;PAUSED/&gt;</div>
-                <h2 className="mono neon-text" style={{ fontSize: '1.4rem', marginBottom: '1.5rem', letterSpacing: '0.3rem' }}>MISSION_ON_STANDBY</h2>
+              <div className="message-container" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '15vw', opacity: 0.02, fontWeight: '900', pointerEvents: 'none' }}>00</div>
+                <div className="flicker" style={{ fontSize: 'clamp(1.5rem, 8vw, 2.5rem)', marginBottom: '1rem', color: 'var(--secondary)', opacity: 0.3 }}>&lt;PAUSED/&gt;</div>
+                <h2 className="mono neon-text cyber-title" style={{ marginBottom: '1.5rem' }}>MISSION_ON_STANDBY</h2>
                 <div style={{ height: '1px', background: 'var(--secondary)', width: '100px', opacity: 0.2, marginBottom: '1.5rem' }}></div>
                 <p className="mono" style={{ fontSize: '0.8rem', opacity: 0.6, maxWidth: '400px', lineHeight: '1.8' }}>
                   THE GLOBAL DECODING STREAM IS CURRENTLY DEACTIVATED. AWAIT COMMAND FROM BASE FOR INITIALIZATION.
@@ -189,13 +189,13 @@ export default function GameRoom({ user }) {
                 <div className="flicker" style={{ marginTop: '2rem', fontSize: '0.6rem', color: 'var(--secondary)' }}>// MONITORING_ENCRYPTED_FREQUENCIES...</div>
               </div>
             ) : userProgress?.level > gameConfig.unlockedLevel ? (
-              <div style={{ textAlign: 'center', padding: '3rem', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+              <div className="message-container" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 <div style={{ position: 'absolute', fontSize: '15vw', fontWeight: '900', color: 'var(--secondary)', opacity: 0.03, pointerEvents: 'none' }}>LOCKED</div>
                 <div style={{ position: 'relative', marginBottom: '2rem' }}>
                    <div style={{ fontSize: '4rem', opacity: 0.1 }}>010101</div>
-                   <div className="mono neon-text" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', fontWeight: 'bold', fontSize: '1.5rem', letterSpacing: '0.5rem' }}>SECURE</div>
+                   <div className="mono neon-text cyber-title" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', fontWeight: 'bold' }}>SECURE</div>
                 </div>
-                <h2 className="mono" style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--secondary)', letterSpacing: '0.2rem' }}>LEVEL_{userProgress.level}_LOCKED</h2>
+                <h2 className="mono cyber-title" style={{ marginBottom: '1rem', color: 'var(--secondary)' }}>LEVEL_{userProgress.level}_LOCKED</h2>
                 <p className="mono" style={{ fontSize: '0.8rem', opacity: 0.6, maxWidth: '400px', lineHeight: '1.8' }}>
                   CONGRATULATIONS AGENT. YOU HAVE CLEARED ALL ACTIVE LEVELS. WAIT FOR THE NEXT FREQUENCY TO BE UNLOCKED.
                 </p>
@@ -231,11 +231,11 @@ export default function GameRoom({ user }) {
             )}
           </>
         ) : (
-          <div style={{ textAlign: 'center', padding: '3rem', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div className="message-container" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', opacity: 0.05, top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-              <div className="flicker" style={{ fontSize: '10vw', fontWeight: '900', position: 'absolute', left: '10%', top: '20%' }}>DECODED</div>
+              <div className="flicker" style={{ fontSize: '15vw', fontWeight: '900', position: 'absolute', left: '10%', top: '20%' }}>DECODED</div>
             </div>
-            <h2 className="neon-text flicker" style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '0.4rem' }}>OPERATION_COMPLETE</h2>
+            <h2 className="neon-text flicker cyber-title-large" style={{ marginBottom: '1.5rem' }}>OPERATION_COMPLETE</h2>
             <div style={{ height: '2px', background: 'var(--primary)', width: '80px', marginBottom: '2rem' }}></div>
             <p className="mono" style={{ fontSize: '0.9rem', opacity: 0.8, maxWidth: '450px', lineHeight: '1.8' }}>
               YOU HAVE SUCCESSFULLY DECRYPTED ALL AVAILABLE DATA STREAMS. REMAIN VIGILANT FOR THE NEXT WAVE OF INTEL.

@@ -185,4 +185,39 @@ input:focus {
     text-align: center !important;
     gap: 1.5rem !important;
   }
+
+  /* New Utility Classes for Mobile Visibility */
+  .cyber-title {
+    font-size: clamp(0.9rem, 4.5vw, 1.4rem) !important;
+    letter-spacing: clamp(0px, 1vw, 0.15rem) !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cyber-title-large {
+    font-size: clamp(1.2rem, 7vw, 2.2rem) !important;
+    letter-spacing: clamp(0.1rem, 2vw, 0.4rem) !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .message-container {
+    padding: clamp(1rem, 5vw, 3rem) 0.5rem !important;
+    min-height: auto !important;
+  }
+
+  .responsive-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+  
+  .responsive-header span {
+    text-align: left !important;
+    width: 100% !important;
+  }
 }
