@@ -98,7 +98,11 @@ export default function AdminPage() {
     if (!newLevel.id || !newLevel.answer || !newLevel.image) return;
     setStatus('SAVING...');
     try {
-      await setDoc(doc(db, 'levels', newLevel.id), newLevel);
+      const levelToSave = { 
+        ...newLevel, 
+        hintUnlockTime: newLevel.hintUnlockTime ? new Date(newLevel.hintUnlockTime).toISOString() : '' 
+      };
+      await setDoc(doc(db, 'levels', newLevel.id), levelToSave);
       setStatus(editingLevelId ? 'LEVEL_UPDATED' : 'LEVEL_ADDED');
       setNewLevel({ id: '', answer: '', hint: '', image: '', hintUnlockTime: '' });
       setEditingLevelId(null);
@@ -195,7 +199,13 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '5px' }}>
-                    <button onClick={() => {setEditingLevelId(lvl.id); setNewLevel(lvl); window.scrollTo({top:0, behavior:'smooth'}); }} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>EDIT</button>
+                    <button onClick={() => {
+                      setEditingLevelId(lvl.id); 
+                      // Convert UTC ISO back to local datetime-local format for editing
+                      const localTime = lvl.hintUnlockTime ? new Date(lvl.hintUnlockTime).toLocaleString('sv').replace(' ', 'T').slice(0, 16) : '';
+                      setNewLevel({ ...lvl, hintUnlockTime: localTime }); 
+                      window.scrollTo({top:0, behavior:'smooth'}); 
+                    }} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>EDIT</button>
                     <button onClick={async () => {if(confirm(`Delete ${lvl.id}?`)) await deleteDoc(doc(db, 'levels', lvl.id))}} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}>DEL</button>
                   </div>
                 </div>
