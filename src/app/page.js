@@ -55,14 +55,20 @@ export default function Home() {
               Welcome, Agent. Verify your credentials to enter the decoding chamber.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <button onClick={handleLogin} style={{ width: '100%' }}>
+              <button 
+                onClick={handleLogin} 
+                style={{ width: '100%', fontSize: 'clamp(0.6rem, 3.3vw, 0.9rem)', letterSpacing: '-0.02em', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              >
                 [ VERIFY_IDENTITY_VIA_GOOGLE ]
               </button>
-              <button onClick={() => setIsBriefingOpen(true)} style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
+              <button 
+                onClick={() => setIsBriefingOpen(true)} 
+                style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)', fontSize: 'clamp(0.6rem, 3.3vw, 0.9rem)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              >
                 [ VIEW_RULES ]
               </button>
               <Link href="/results" style={{ width: '100%' }}>
-                <button style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>
+                <button style={{ width: '100%', borderColor: 'var(--secondary)', color: 'var(--secondary)', fontSize: 'clamp(0.6rem, 3.3vw, 0.9rem)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   [ VIEW_TOURNAMENT_RESULTS ]
                 </button>
               </Link>

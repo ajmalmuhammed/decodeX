@@ -35,16 +35,16 @@ export default function AuthGuard({ children, adminOnly = false }) {
     return (
       <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: '#000', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', fontSize: '20vw', fontWeight: '900', color: 'var(--accent)', opacity: 0.03, pointerEvents: 'none', userSelect: 'none', zHeight: 0 }}>403</div>
-        <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', maxWidth: '500px', zIndex: 1, border: '1px solid var(--accent)' }}>
-          <h1 className="flicker" style={{ color: 'var(--accent)', fontSize: '2rem', marginBottom: '1rem', letterSpacing: '0.2rem' }}>ACCESS_DENIED</h1>
-          <div style={{ height: '2px', background: 'var(--accent)', opacity: 0.3, width: '50px', margin: '0 auto 2rem auto' }}></div>
-          <p className="mono" style={{ marginBottom: '2.5rem', fontSize: '0.9rem', lineHeight: '1.6' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(1.5rem, 5vw, 3rem)', textAlign: 'center', maxWidth: '400px', width: '90%', zIndex: 1, border: '1px solid var(--accent)' }}>
+          <h1 className="flicker" style={{ color: 'var(--accent)', fontSize: 'clamp(1.2rem, 7vw, 2.22rem)', marginBottom: '1rem', letterSpacing: '0.05rem', width: '100%', textAlign: 'center' }}>ACCESS_DENIED</h1>
+          <div style={{ height: '2px', background: 'var(--accent)', opacity: 0.3, width: '40px', margin: '0 auto 1.5rem auto' }}></div>
+          <p className="mono" style={{ marginBottom: '2.5rem', fontSize: 'clamp(0.75rem, 3.5vw, 0.9rem)', lineHeight: '1.6', wordBreak: 'break-word' }}>
             {!user 
-              ? 'CRITICAL_ERROR: NO_ACTIVE_SESSION_DETECTED. PLEASE_AUTHENTICATE_AT_THE_MAIN_TERMINAL.' 
+              ? 'CRITICAL_ERROR: NO_ACTIVE_SESSION_DETECTED. PLEASE_AUTHENTICATE' 
               : 'SECURITY_VIOLATION: YOUR_CREDENTIALS_LACK_ADMIN_OVERSIGHT_PERMISSIONS.'}
           </p>
           <Link href="/">
-            <button style={{ width: '100%', borderColor: 'var(--accent)', color: 'var(--accent)' }}>[ RETURN_TO_ENTRY_POINT ]</button>
+            <button style={{ width: '100%', borderColor: 'var(--accent)', color: 'var(--accent)', fontSize: '0.8rem' }}>[ RETURN_TO_ENTRY_POINT ]</button>
           </Link>
         </div>
       </main>
