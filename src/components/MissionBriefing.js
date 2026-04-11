@@ -72,7 +72,8 @@ export default function MissionBriefing({ isOpen, onClose }) {
           marginBottom: '2rem',
           borderBottom: '1px solid var(--glass-border)',
           paddingBottom: '10px',
-          overflowX: 'auto'
+          overflowX: 'auto',
+          flexShrink: 0
         }}>
           {tabs.map(tab => (
             <button
@@ -94,12 +95,13 @@ export default function MissionBriefing({ isOpen, onClose }) {
           ))}
         </div>
 
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
           gap: '2rem',
           overflowY: 'auto',
-          paddingRight: '10px'
+          paddingRight: '10px',
+          flex: 1
         }}>
 
           {activeTab === 'decodex' && (
@@ -251,21 +253,21 @@ export default function MissionBriefing({ isOpen, onClose }) {
               </section>
             </>
           )}
-
-          <button
-            onClick={onClose}
-            style={{
-              marginTop: '1rem',
-              width: '100%',
-              borderColor: 'var(--secondary)',
-              color: 'var(--secondary)',
-              flexShrink: 0
-            }}
-          >
-            ACKNOWLEDGE_MISSION
-          </button>
-
         </div>
+
+        <button 
+          onClick={onClose} 
+          style={{ 
+            marginTop: '2rem', 
+            width: '100%', 
+            borderColor: 'var(--secondary)', 
+            color: 'var(--secondary)',
+            flexShrink: 0,
+            zIndex: 10
+          }}
+        >
+          ACKNOWLEDGE_MISSION
+        </button>
 
         <div className="mono" style={{ position: 'absolute', bottom: '10px', right: '20px', fontSize: '0.6rem', opacity: 0.2, textAlign: 'right' }}>
           DOC_ID: BRF_7749_X
