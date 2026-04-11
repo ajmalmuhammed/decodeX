@@ -14,15 +14,39 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      if (currentUser) {
+        initializeUser(currentUser);
+      }
     });
     return () => unsubscribe();
   }, []);
 
   const handleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user) {
+        await initializeUser(result.user);
+      }
     } catch (error) {
       console.error("Login failed:", error);
+    }
+  };
+
+  const initializeUser = async (currentUser) => {
+    try {
+      const token = await currentUser.getIdToken();
+      await fetch('/api/game-init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          uid: currentUser.uid,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL
+        })
+      });
+    } catch (err) {
+      console.error("Early Init Error:", err);
     }
   };
 
