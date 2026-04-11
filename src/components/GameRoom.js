@@ -200,7 +200,7 @@ export default function GameRoom({ user }) {
                 </div>
                 <h2 className="mono cyber-title" style={{ marginBottom: '1rem', color: 'var(--secondary)' }}>LEVEL_{userProgress.level}_LOCKED</h2>
                 <p className="mono" style={{ fontSize: '0.8rem', opacity: 0.6, maxWidth: '400px', lineHeight: '1.8' }}>
-                  CONGRATULATIONS AGENT. YOU HAVE CLEARED ALL ACTIVE LEVELS. WAIT FOR THE NEXT FREQUENCY TO BE UNLOCKED.
+                  CONGRATULATIONS AGENT. YOU HAVE CLEARED ALL ACTIVE LEVELS. WAIT FOR THE NEXT TO BE UNLOCKED.
                 </p>
                 <div className="flicker" style={{ marginTop: '2rem', fontSize: '0.6rem', color: 'var(--primary)' }}>// SCANNING_FOR_UNLOCK_SIGNAL...</div>
               </div>
