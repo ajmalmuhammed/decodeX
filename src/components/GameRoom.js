@@ -12,8 +12,9 @@ export default function GameRoom({ user }) {
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [gameConfig, setGameConfig] = useState({ gameStatus: 'active', unlockedLevel: 99 });
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(null);
   const [debugHintOverride, setDebugHintOverride] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   
   const fetchInProgress = useRef(false);
   const isAdmin = ['muhammed.ajmal@webcardio.com', 'aysha.s@webcardio.com'].includes(user?.email?.toLowerCase());
@@ -121,6 +122,8 @@ export default function GameRoom({ user }) {
       if (snap.exists()) setGameConfig(snap.data());
     });
 
+    setHasMounted(true);
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => { unsubscribe(); unsubscribeConfig(); clearInterval(timer); };
   }, []);
@@ -171,8 +174,8 @@ export default function GameRoom({ user }) {
     <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
       <div className="glass-panel" style={{ padding: '2rem' }}>
         <div className="mono responsive-header" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
-          <span>MODULE: {levelData?.isFinished ? 'COMPLETED' : `LEVEL_${userProgress?.level}`}</span>
-          <span className="neon-text">AGENT: {user.displayName}</span>
+          <span>MODULE: {(!levelData || !hasMounted) ? 'INITIALIZING...' : (levelData.isFinished ? 'COMPLETED' : `LEVEL_${userProgress?.level}`)}</span>
+          <span className="neon-text">AGENT: {hasMounted ? user.displayName : '...'}</span>
         </div>
 
         {!levelData?.isFinished ? (
@@ -209,10 +212,14 @@ export default function GameRoom({ user }) {
                 </div>
 
                 <div style={{ marginBottom: '1.5rem', minHeight: '4rem' }}>
-                  {(levelData?.hintUnlockTime && new Date(levelData.hintUnlockTime) > currentTime && !debugHintOverride) ? (
-                    <div className="glass-panel" style={{ padding: '12px', background: 'rgba(0, 229, 255, 0.03)', border: '1px dashed var(--secondary)', textAlign: 'center' }}>
-                       <div className="mono neon-text flicker" style={{ fontSize: '1.2rem', color: 'var(--secondary)' }}>
+                  {(hasMounted && currentTime && levelData?.hintUnlockTime && new Date(levelData.hintUnlockTime) > currentTime && !debugHintOverride) ? (
+                    <div className="glass-panel" style={{ padding: '1rem', background: 'rgba(0, 229, 255, 0.03)', border: '1px dashed var(--secondary)', textAlign: 'center' }}>
+                       <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '0.5rem', letterSpacing: '0.1rem' }}>[HINT_REVEAL_IN]</div>
+                       <div className="mono neon-text flicker" style={{ fontSize: '1.4rem', color: 'var(--secondary)' }}>
                          {formatCountdown(levelData.hintUnlockTime)}
+                       </div>
+                       <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.3, marginTop: '0.8rem' }}>
+                         ETA: {new Date(levelData.hintUnlockTime).toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toUpperCase()}
                        </div>
                     </div>
                   ) : (
@@ -222,7 +229,7 @@ export default function GameRoom({ user }) {
                   )}
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
+                <form onSubmit={handleSubmit} className="responsive-form" style={{ display: 'flex', gap: '10px' }}>
                   <input type="text" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="ENTER_DECODED_STRING..." autoComplete="off" disabled={isFetching} />
                   <button type="submit" disabled={isFetching}>SUBMIT</button>
                 </form>

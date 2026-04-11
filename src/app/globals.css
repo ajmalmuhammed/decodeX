@@ -206,7 +206,7 @@ input:focus {
   }
 
   .message-container {
-    padding: clamp(1rem, 5vw, 3rem) 0.5rem !important;
+    padding: clamp(0.75rem, 4vw, 2.5rem) 0.5rem !important;
     min-height: auto !important;
   }
 
@@ -218,6 +218,20 @@ input:focus {
   
   .responsive-header span {
     text-align: left !important;
+    width: 100% !important;
+  }
+
+  .responsive-form {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .responsive-form input {
+    width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+
+  .responsive-form button {
     width: 100% !important;
   }
 }
