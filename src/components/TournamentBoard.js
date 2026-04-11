@@ -7,6 +7,7 @@ export default function TournamentBoard() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('carrom');
+  const [selectedRound, setSelectedRound] = useState('all');
 
   useEffect(() => {
     const q = query(collection(db, 'matches'), orderBy('id', 'desc'));
@@ -32,11 +33,19 @@ export default function TournamentBoard() {
       if (!grouped[m.round]) grouped[m.round] = [];
       grouped[m.round].push(m);
     });
-    // Sort rounds semi-logically (could be improved with custom order)
-    return Object.keys(grouped).sort().map(r => ({ name: r, matches: grouped[r] }));
+    
+    // Get unique round names for the tab bar
+    const allRoundNames = Object.keys(grouped).sort();
+    
+    // Prepare rounds for display (filtered by selectedRound)
+    const displayRounds = allRoundNames
+      .filter(r => selectedRound === 'all' || r === selectedRound)
+      .map(r => ({ name: r, matches: grouped[r] }));
+
+    return { displayRounds, allRoundNames };
   };
 
-  const currentRounds = getRounds(selectedTab);
+  const { displayRounds, allRoundNames } = getRounds(selectedTab);
 
   const MatchCard = ({ match }) => (
     <div className="glass-panel" style={{ 
@@ -94,46 +103,95 @@ export default function TournamentBoard() {
     <div style={{ width: '100%', maxWidth: '100%' }}>
       
       {/* Game Type Tabs */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', width: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem', width: '100%' }}>
         <button 
-          onClick={() => setSelectedTab('carrom')}
+          onClick={() => { setSelectedTab('carrom'); setSelectedRound('all'); }}
           style={{ 
             flex: 1, 
             background: selectedTab === 'carrom' ? 'var(--primary)' : 'transparent',
             color: selectedTab === 'carrom' ? 'black' : 'var(--primary)',
             borderColor: 'var(--primary)',
-            padding: '8px 4px'
+            padding: '8px 4px',
+            fontSize: '0.75rem',
+            fontWeight: 'bold'
           }}
         >
           [ CARROM ]
         </button>
         <button 
-          onClick={() => setSelectedTab('ludo')}
+          onClick={() => { setSelectedTab('ludo'); setSelectedRound('all'); }}
           style={{ 
             flex: 1, 
             background: selectedTab === 'ludo' ? 'var(--secondary)' : 'transparent',
             color: selectedTab === 'ludo' ? 'black' : 'var(--secondary)',
             borderColor: 'var(--secondary)',
-            padding: '8px 4px'
+            padding: '8px 4px',
+            fontSize: '0.75rem',
+            fontWeight: 'bold'
           }}
         >
           [ LUDO ]
         </button>
       </div>
 
+      {/* Round Sub-Tabs */}
+      {allRoundNames.length > 0 && (
+        <div className="mono" style={{ 
+          display: 'flex', 
+          gap: '10px', 
+          marginBottom: '2.5rem', 
+          overflowX: 'auto', 
+          paddingBottom: '12px',
+          borderBottom: '1px solid var(--glass-border)',
+          justifyContent: allRoundNames.length < 4 ? 'center' : 'flex-start'
+        }}>
+          <button
+            onClick={() => setSelectedRound('all')}
+            style={{
+              padding: '4px 12px',
+              fontSize: '0.6rem',
+              background: selectedRound === 'all' ? 'rgba(255,255,255,0.1)' : 'transparent',
+              border: '1px solid',
+              borderColor: selectedRound === 'all' ? 'white' : 'rgba(255,255,255,0.2)',
+              color: selectedRound === 'all' ? 'white' : 'rgba(255,255,255,0.5)',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            [ ALL_ROUNDS ]
+          </button>
+          {allRoundNames.map(r => (
+            <button
+              key={r}
+              onClick={() => setSelectedRound(r)}
+              style={{
+                padding: '4px 12px',
+                fontSize: '0.6rem',
+                background: selectedRound === r ? 'rgba(255,255,255,0.1)' : 'transparent',
+                border: '1px solid',
+                borderColor: selectedRound === r ? (selectedTab === 'carrom' ? 'var(--primary)' : 'var(--secondary)') : 'rgba(255,255,255,0.2)',
+                color: selectedRound === r ? (selectedTab === 'carrom' ? 'var(--primary)' : 'var(--secondary)') : 'rgba(255,255,255,0.5)',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              [ {r.toUpperCase()} ]
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Brackets Area */}
       <div className="responsive-flex" style={{ display: 'flex', gap: '2rem', justifyContent: 'center', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        {currentRounds.length === 0 ? (
+        {displayRounds.length === 0 ? (
           <div style={{ padding: '4rem', textAlign: 'center', width: '100%' }}>
             <p className="mono" style={{ opacity: 0.5 }}>NO_ACTIVE_MATCHES_DETECTED</p>
             <p className="mono" style={{ fontSize: '0.6rem', opacity: 0.3, marginTop: '1rem' }}>STAY_TUNED_FOR_ALLOCATIONS</p>
           </div>
         ) : (
-          currentRounds.map((r, i) => (
+          displayRounds.map((r, i) => (
             <React.Fragment key={r.name}>
               <RoundColumn round={r} color={selectedTab === 'carrom' ? 'var(--primary)' : 'var(--secondary)'} />
-              {/* Optional Connector - Hidden on mobile via responsive-flex behavior */}
-              {i < currentRounds.length - 1 && (
+              {/* Optional Connector - Hidden on mobile or if single round viewed */}
+              {i < displayRounds.length - 1 && selectedRound === 'all' && (
                 <div className="mono" style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
