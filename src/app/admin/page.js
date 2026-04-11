@@ -13,6 +13,8 @@ export default function AdminPage() {
   const [status, setStatus] = useState('');
   const [gameConfig, setGameConfig] = useState({ gameStatus: 'standby', unlockedLevel: 1 });
   const [editingLevelId, setEditingLevelId] = useState(null);
+  const [revealedAnswers, setRevealedAnswers] = useState([]);
+  const [showFormAnswer, setShowFormAnswer] = useState(false);
 
   const setupDataSubscriptions = () => {
     const qLevels = query(collection(db, 'levels'), orderBy('id', 'asc'));
@@ -161,7 +163,33 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>DECODED_ANSWER</label>
-                <input value={newLevel.answer} onChange={e => setNewLevel(prev => ({ ...prev, answer: e.target.value }))} placeholder="The Answer" required />
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type={showFormAnswer ? "text" : "password"} 
+                    value={newLevel.answer} 
+                    onChange={e => setNewLevel(prev => ({ ...prev, answer: e.target.value }))} 
+                    placeholder="The Answer" 
+                    required 
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowFormAnswer(!showFormAnswer)}
+                    style={{ 
+                      position: 'absolute', 
+                      right: '0', 
+                      top: '0', 
+                      height: '100%', 
+                      border: 'none', 
+                      background: 'rgba(255,255,255,0.05)',
+                      fontSize: '0.6rem',
+                      width: '40px',
+                      padding: '0'
+                    }}
+                  >
+                    {showFormAnswer ? 'HIDE' : 'SHOW'}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="mono" style={{ fontSize: '0.7rem', opacity: 0.7 }}>IMAGE_PATH</label>
@@ -189,27 +217,49 @@ export default function AdminPage() {
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
             <h3 className="mono" style={{ marginBottom: '1.5rem' }}>CURRENT_LEVELS</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {levels.map(lvl => (
-                <div key={lvl.id} style={{ padding: '10px', border: '1px solid var(--glass-border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <img src={lvl.image} alt="" style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--glass-border)' }} />
-                    <div>
-                      <span className="neon-text mono">{lvl.id}:</span> {lvl.answer} <br/>
-                      <span className="mono" style={{ opacity: 0.5 }}>PATH: {lvl.image}</span>
+              {levels.map(lvl => {
+                const isRevealed = revealedAnswers.includes(lvl.id);
+                return (
+                  <div key={lvl.id} style={{ padding: '10px', border: '1px solid var(--glass-border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <img src={lvl.image} alt="" style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--glass-border)' }} />
+                      <div>
+                        <span className="neon-text mono">{lvl.id}:</span> 
+                        <span style={{ marginLeft: '10px', verticalAlign: 'middle' }}>
+                          {isRevealed ? lvl.answer : '********'}
+                        </span>
+                        <button 
+                          onClick={() => setRevealedAnswers(prev => 
+                            isRevealed ? prev.filter(id => id !== lvl.id) : [...prev, lvl.id]
+                          )}
+                          style={{ 
+                            marginLeft: '10px', 
+                            padding: '2px 6px', 
+                            fontSize: '0.6rem', 
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            verticalAlign: 'middle'
+                          }}
+                        >
+                          {isRevealed ? 'HIDE' : 'VIEW'}
+                        </button>
+                        <br/>
+                        <span className="mono" style={{ opacity: 0.5 }}>PATH: {lvl.image}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                      <button onClick={() => {
+                        setEditingLevelId(lvl.id); 
+                        // Convert UTC ISO back to local datetime-local format for editing
+                        const localTime = lvl.hintUnlockTime ? new Date(lvl.hintUnlockTime).toLocaleString('sv').replace(' ', 'T').slice(0, 16) : '';
+                        setNewLevel({ ...lvl, hintUnlockTime: localTime }); 
+                        window.scrollTo({top:0, behavior:'smooth'}); 
+                      }} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>EDIT</button>
+                      <button onClick={async () => {if(confirm(`Delete ${lvl.id}?`)) await deleteDoc(doc(db, 'levels', lvl.id))}} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}>DEL</button>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '5px' }}>
-                    <button onClick={() => {
-                      setEditingLevelId(lvl.id); 
-                      // Convert UTC ISO back to local datetime-local format for editing
-                      const localTime = lvl.hintUnlockTime ? new Date(lvl.hintUnlockTime).toLocaleString('sv').replace(' ', 'T').slice(0, 16) : '';
-                      setNewLevel({ ...lvl, hintUnlockTime: localTime }); 
-                      window.scrollTo({top:0, behavior:'smooth'}); 
-                    }} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>EDIT</button>
-                    <button onClick={async () => {if(confirm(`Delete ${lvl.id}?`)) await deleteDoc(doc(db, 'levels', lvl.id))}} style={{ padding: '5px 10px', fontSize: '0.6rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}>DEL</button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
