@@ -105,7 +105,7 @@ export default function MissionBriefing({ isOpen, onClose }) {
           {activeTab === 'decodex' && (
             <>
               <div style={{ padding: '5px 12px', background: 'rgba(0, 229, 255, 0.1)', borderLeft: '3px solid var(--secondary)', marginBottom: '1rem' }}>
-                <span className="mono" style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--secondary)' }}>CORE_MISSION_OBJECTIVES</span>
+                <span className="mono" style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--secondary)' }}>DECODEX_MISSION_OBJECTIVES</span>
               </div>
 
               <section>
