@@ -187,7 +187,7 @@ export default function GameRoom({ user }) {
                 <h2 className="mono neon-text cyber-title" style={{ marginBottom: '1.5rem' }}>MISSION_ON_STANDBY</h2>
                 <div style={{ height: '1px', background: 'var(--secondary)', width: '100px', opacity: 0.2, marginBottom: '1.5rem' }}></div>
                 <p className="mono" style={{ fontSize: '0.8rem', opacity: 0.6, maxWidth: '400px', lineHeight: '1.8' }}>
-                  THE GLOBAL DECODING STREAM IS CURRENTLY DEACTIVATED. AWAIT COMMAND FROM BASE FOR INITIALIZATION.
+                  AWAIT COMMAND FROM ADMINS FOR INITIALIZATION.
                 </p>
                 <div className="flicker" style={{ marginTop: '2rem', fontSize: '0.6rem', color: 'var(--secondary)' }}>// MONITORING_ENCRYPTED_FREQUENCIES...</div>
               </div>
